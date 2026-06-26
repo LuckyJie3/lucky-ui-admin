@@ -1,19 +1,17 @@
-import './assets/css/normalize.css'
-import App from './App.vue'
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import App from './App.vue'
+import pinia, { setupI18nSync } from './stores'
 import router from './router'
-
-import ElementPlus from 'element-plus'
+import i18n from './locales'
 import 'element-plus/dist/index.css'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-
+import '@/assets/styles/index.scss'
 
 const app = createApp(App)
-app.use(createPinia())
+
+app.use(pinia)
 app.use(router)
-app.use(ElementPlus)
-for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-  app.component(key, component)
-}
+app.use(i18n)
+
+setupI18nSync(i18n)
+
 app.mount('#app')

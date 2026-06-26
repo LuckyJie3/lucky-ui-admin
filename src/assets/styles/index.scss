@@ -1,0 +1,83 @@
+@use './variables.scss';
+@use './mixins.scss' as *;
+@use './reset.scss';
+@use './transition.scss';
+@use './element-theme.scss';
+
+html,
+body,
+#app {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-shell);
+  transition: background var(--transition-base), color var(--transition-base);
+}
+
+.page-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.page-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 128px;
+  padding: 22px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  @include glass-surface;
+  @include glass-edge;
+}
+
+.page-hero__eyebrow {
+  margin-bottom: 8px;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.page-hero__title {
+  font-size: clamp(26px, 4vw, 42px);
+  font-weight: 780;
+  letter-spacing: 0;
+  line-height: 1.05;
+}
+
+.page-hero__subtitle {
+  max-width: 620px;
+  margin-top: 12px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.section-title {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 720;
+}
+
+.muted-text {
+  color: var(--text-muted);
+}
+
+.glass-panel {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  @include glass-surface;
+  @include glass-edge;
+}
+
+@media (max-width: 768px) {
+  .page-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
