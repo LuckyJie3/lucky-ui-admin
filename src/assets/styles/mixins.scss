@@ -1,26 +1,15 @@
-@mixin glass-surface {
-  position: relative;
-  background: linear-gradient(145deg, var(--glass-bg-strong), var(--glass-bg));
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+@mixin card-surface {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
-@mixin glass-edge {
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    border-radius: inherit;
-    background:
-      linear-gradient(135deg, var(--glass-highlight), transparent 34%),
-      linear-gradient(315deg, rgba(var(--color-primary-rgb), 0.16), transparent 28%);
-    mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
-    mask-composite: exclude;
-    padding: 1px;
-  }
+@mixin elevated-surface {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
 }
 
 @mixin text-ellipsis {
@@ -37,8 +26,8 @@
 
 @mixin custom-scrollbar {
   &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   &::-webkit-scrollbar-track {
@@ -46,8 +35,14 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(105, 124, 127, 0.32);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 999px;
+  }
+
+  [data-theme='dark'] & {
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+    }
   }
 }
 

@@ -1,38 +1,37 @@
 <template>
   <div class="page-shell dashboard-page">
     <section class="page-hero">
-      <div>
-        <p class="page-hero__eyebrow">Lucky Admin</p>
+      <div class="hero-info">
+        <p class="page-hero__eyebrow">Dashboard</p>
         <h1 class="page-hero__title">{{ t('dashboard.title') }}</h1>
         <p class="page-hero__subtitle">{{ t('dashboard.subtitle') }}</p>
       </div>
-      <div class="hero-orbit">
-        <span>{{ t('dashboard.target') }}</span>
-        <strong>92%</strong>
+      <div class="hero-badge">
+        <span class="badge-label">{{ t('dashboard.target') }}</span>
+        <strong class="badge-value">92%</strong>
       </div>
     </section>
 
     <section class="stats-grid">
-      <GlassCard v-for="item in stats" :key="item.key" variant="strong">
-        <div class="stat-card">
-          <span class="stat-icon" :style="{ color: item.color, backgroundColor: item.tint }">
-            <el-icon><component :is="item.icon" /></el-icon>
+      <div v-for="item in stats" :key="item.key" class="stat-card">
+        <div class="stat-card__header">
+          <span class="stat-card__label">{{ t(item.label) }}</span>
+          <span class="stat-card__icon" :style="{ color: item.color, background: item.tint }">
+            <el-icon :size="16"><component :is="item.icon" /></el-icon>
           </span>
-          <div>
-            <p class="stat-label">{{ t(item.label) }}</p>
-            <strong class="stat-value">{{ item.value }}</strong>
-            <span class="stat-trend" :class="{ down: item.trend < 0 }">
-              {{ item.trend > 0 ? '+' : '' }}{{ item.trend }}% {{ t('dashboard.vsLastMonth') }}
-            </span>
-          </div>
         </div>
-      </GlassCard>
+        <div class="stat-card__value">{{ item.value }}</div>
+        <div class="stat-card__trend" :class="{ down: item.trend < 0 }">
+          <span>{{ item.trend > 0 ? '&#8593;' : '&#8595;' }} {{ Math.abs(item.trend) }}%</span>
+          <span class="trend-desc">{{ t('dashboard.vsLastMonth') }}</span>
+        </div>
+      </div>
     </section>
 
     <section class="dashboard-grid">
-      <GlassCard :title="t('dashboard.salesOverview')" class="chart-card">
+      <GlassCard :title="t('dashboard.salesOverview')">
         <div class="chart">
-          <div v-for="bar in bars" :key="bar.month" class="chart__item">
+          <div v-for="bar in bars" :key="bar.month" class="chart__col">
             <span class="chart__bar" :style="{ height: `${bar.value}%` }" />
             <small>{{ bar.month }}</small>
           </div>
@@ -42,21 +41,21 @@
       <GlassCard :title="t('dashboard.channelHealth')">
         <div class="health-list">
           <div v-for="item in health" :key="item.label" class="health-item">
-            <div>
-              <strong>{{ t(item.label) }}</strong>
-              <span>{{ item.value }}%</span>
+            <div class="health-item__head">
+              <span>{{ t(item.label) }}</span>
+              <strong>{{ item.value }}%</strong>
             </div>
-            <el-progress :percentage="item.value" :stroke-width="9" :show-text="false" />
+            <el-progress :percentage="item.value" :stroke-width="6" :show-text="false" :color="'var(--color-primary)'" />
           </div>
         </div>
       </GlassCard>
     </section>
 
     <GlassCard :title="t('dashboard.recentActivity')">
-      <div class="activity-grid">
+      <div class="activity-list">
         <article v-for="item in activities" :key="item.id" class="activity-item">
           <span class="activity-dot" />
-          <div>
+          <div class="activity-content">
             <strong>{{ item.title }}</strong>
             <p>{{ item.desc }}</p>
           </div>
@@ -75,25 +74,17 @@ import GlassCard from '@/components/common/GlassCard.vue'
 const { t } = useI18n()
 
 const stats = [
-  { key: 'users', label: 'dashboard.totalUsers', value: '128,460', trend: 12.8, icon: UserFilled, color: '#0f8f8c', tint: 'rgba(15, 143, 140, 0.14)' },
-  { key: 'active', label: 'dashboard.activeUsers', value: '38,212', trend: 8.4, icon: TrendCharts, color: '#4f46e5', tint: 'rgba(79, 70, 229, 0.13)' },
-  { key: 'revenue', label: 'dashboard.revenue', value: '$928k', trend: 6.1, icon: Coin, color: '#d97706', tint: 'rgba(217, 119, 6, 0.14)' },
-  { key: 'orders', label: 'dashboard.orders', value: '51,328', trend: -2.3, icon: Files, color: '#dc2626', tint: 'rgba(220, 38, 38, 0.13)' },
+  { key: 'users', label: 'dashboard.totalUsers', value: '128,460', trend: 12.8, icon: UserFilled, color: 'hsl(212, 100%, 45%)', tint: 'hsl(212, 100%, 96%)' },
+  { key: 'active', label: 'dashboard.activeUsers', value: '38,212', trend: 8.4, icon: TrendCharts, color: 'hsl(144, 57%, 58%)', tint: 'hsl(144, 57%, 96%)' },
+  { key: 'revenue', label: 'dashboard.revenue', value: '$928k', trend: 6.1, icon: Coin, color: 'hsl(42, 84%, 61%)', tint: 'hsl(42, 84%, 96%)' },
+  { key: 'orders', label: 'dashboard.orders', value: '51,328', trend: -2.3, icon: Files, color: 'hsl(348, 100%, 61%)', tint: 'hsl(348, 100%, 97%)' },
 ]
 
 const bars = [
-  { month: 'Jan', value: 38 },
-  { month: 'Feb', value: 54 },
-  { month: 'Mar', value: 46 },
-  { month: 'Apr', value: 68 },
-  { month: 'May', value: 59 },
-  { month: 'Jun', value: 84 },
-  { month: 'Jul', value: 71 },
-  { month: 'Aug', value: 76 },
-  { month: 'Sep', value: 92 },
-  { month: 'Oct', value: 81 },
-  { month: 'Nov', value: 88 },
-  { month: 'Dec', value: 96 },
+  { month: 'Jan', value: 38 }, { month: 'Feb', value: 54 }, { month: 'Mar', value: 46 },
+  { month: 'Apr', value: 68 }, { month: 'May', value: 59 }, { month: 'Jun', value: 84 },
+  { month: 'Jul', value: 71 }, { month: 'Aug', value: 76 }, { month: 'Sep', value: 92 },
+  { month: 'Oct', value: 81 }, { month: 'Nov', value: 88 }, { month: 'Dec', value: 96 },
 ]
 
 const health = [
@@ -110,170 +101,219 @@ const activities = [
 </script>
 
 <style lang="scss" scoped>
-@use '@/assets/styles/mixins' as *;
-
-.hero-orbit {
-  display: grid;
-  width: 116px;
-  height: 116px;
-  flex: 0 0 116px;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--text-primary);
-  background:
-    linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
-    conic-gradient(from 110deg, var(--color-primary), transparent 74%, var(--color-primary)) border-box;
-  border: 1px solid transparent;
-
-  span {
-    align-self: end;
-    color: var(--text-muted);
-    font-size: 12px;
-  }
-
-  strong {
-    align-self: start;
-    font-size: 30px;
-    line-height: 1;
-  }
+.hero-info {
+  flex: 1;
+  min-width: 0;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.stat-card {
+.hero-badge {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  flex-shrink: 0;
 }
 
-.stat-icon {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-  place-items: center;
-  border-radius: var(--radius-md);
-  font-size: 20px;
-}
-
-.stat-label {
-  color: var(--text-secondary);
-  font-size: 12px;
-}
-
-.stat-value {
-  display: block;
-  margin-top: 4px;
-  color: var(--text-primary);
-  font-size: 26px;
+.badge-label {
+  font-size: 11px;
+  color: var(--text-muted);
   line-height: 1;
 }
 
-.stat-trend {
-  display: inline-block;
-  margin-top: 10px;
-  color: var(--color-success);
-  font-size: 12px;
+.badge-value {
+  font-size: 22px;
   font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+/* ── Stats ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  padding: 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.stat-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.stat-card__label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.stat-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+}
+
+.stat-card__value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.stat-card__trend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-success);
 
   &.down {
     color: var(--color-danger);
   }
+
+  .trend-desc {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
 }
 
+/* ── Chart grid ── */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.55fr);
-  gap: 14px;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
 }
 
 .chart {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(18px, 1fr));
-  align-items: end;
-  height: 260px;
-  gap: 10px;
+  display: flex;
+  align-items: flex-end;
+  height: 220px;
+  gap: 8px;
+  padding-top: 16px;
 }
 
-.chart__item {
-  display: grid;
+.chart__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   height: 100%;
-  grid-template-rows: 1fr auto;
-  gap: 8px;
-  align-items: end;
-  color: var(--text-muted);
-  font-size: 11px;
-  text-align: center;
+  justify-content: flex-end;
+  gap: 6px;
+
+  small {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
 }
 
 .chart__bar {
   width: 100%;
-  min-height: 12px;
-  border-radius: 10px 10px 4px 4px;
-  background: linear-gradient(180deg, rgba(var(--color-primary-rgb), 0.86), rgba(var(--color-primary-rgb), 0.2));
+  min-height: 4px;
+  border-radius: 4px 4px 0 0;
+  background: var(--color-primary);
+  opacity: 0.8;
+  transition: opacity var(--transition-fast);
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
+/* ── Health ── */
 .health-list {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
 }
 
-.health-item {
-  display: grid;
-  gap: 10px;
+.health-item__head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
 
-  div {
-    display: flex;
-    justify-content: space-between;
-    color: var(--text-secondary);
-    font-size: 13px;
+  strong {
+    font-weight: 600;
+    color: var(--text-primary);
   }
 }
 
-.activity-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+/* ── Activity ── */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .activity-item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  display: flex;
+  align-items: flex-start;
   gap: 12px;
-  padding: 14px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.18);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-light);
 
-  strong,
-  p {
-    @include text-ellipsis;
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
   }
 
-  p,
-  time {
-    color: var(--text-muted);
+  &:first-child {
+    padding-top: 0;
+  }
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+
+  strong {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin-top: 2px;
     font-size: 12px;
+    color: var(--text-muted);
   }
 }
 
 .activity-dot {
-  width: 9px;
-  height: 9px;
+  width: 6px;
+  height: 6px;
   margin-top: 6px;
   border-radius: 50%;
   background: var(--color-primary);
-  box-shadow: 0 0 0 5px rgba(var(--color-primary-rgb), 0.12);
+  flex-shrink: 0;
 }
 
-@media (max-width: 1180px) {
-  .stats-grid,
-  .activity-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+time {
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .dashboard-grid {
@@ -282,8 +322,7 @@ const activities = [
 }
 
 @media (max-width: 680px) {
-  .stats-grid,
-  .activity-grid {
+  .stats-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -1,10 +1,10 @@
 <template>
   <div class="error-page">
-    <div class="error-content glass-panel">
+    <div class="error-card">
       <div class="error-code">404</div>
       <h1 class="error-title">{{ t('error404.title') }}</h1>
       <p class="error-desc">{{ t('error404.description') }}</p>
-      <el-button type="primary" size="large" :icon="HomeFilled" @click="$router.push('/dashboard')">
+      <el-button type="primary" :icon="HomeFilled" @click="$router.push('/dashboard')">
         {{ t('error404.backHome') }}
       </el-button>
     </div>
@@ -14,7 +14,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { HomeFilled } from '@element-plus/icons-vue'
-
 const { t } = useI18n()
 </script>
 
@@ -26,31 +25,33 @@ const { t } = useI18n()
   padding: 24px;
 }
 
-.error-content {
-  width: min(520px, 100%);
-  padding: 42px 28px;
+.error-card {
   text-align: center;
+  padding: 48px 32px;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
 }
 
 .error-code {
-  margin-bottom: 10px;
+  font-size: 80px;
+  font-weight: 700;
   color: var(--color-primary);
-  font-size: clamp(80px, 18vw, 128px);
-  font-weight: 840;
-  letter-spacing: 0;
-  line-height: 0.9;
+  line-height: 1;
+  margin-bottom: 12px;
+  opacity: 0.7;
 }
 
 .error-title {
-  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 600;
   color: var(--text-primary);
-  font-size: 24px;
-  font-weight: 760;
+  margin-bottom: 8px;
 }
 
 .error-desc {
-  margin-bottom: 28px;
-  color: var(--text-secondary);
   font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
 }
 </style>

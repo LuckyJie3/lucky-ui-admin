@@ -40,12 +40,12 @@
             <el-slider v-model="form.quota" :min="10" :max="100" show-input />
           </el-form-item>
           <el-form-item :label="t('form.note')" class="span-2">
-            <el-input v-model="form.note" type="textarea" :rows="5" />
+            <el-input v-model="form.note" type="textarea" :rows="4" />
           </el-form-item>
         </div>
       </GlassCard>
 
-      <div class="submit-bar glass-panel">
+      <div class="submit-bar">
         <el-button @click="router.back()">{{ t('common.cancel') }}</el-button>
         <el-button type="primary" :loading="submitting" @click="submitForm">{{ t('common.save') }}</el-button>
       </div>
@@ -67,22 +67,11 @@ const formRef = ref<FormInstance>()
 const submitting = ref(false)
 const plans = ['Starter', 'Growth', 'Enterprise']
 
-const form = reactive({
-  company: '',
-  email: '',
-  name: '',
-  note: '',
-  plan: 'Growth',
-  quota: 60,
-  role: 'operator',
-})
+const form = reactive({ company: '', email: '', name: '', note: '', plan: 'Growth', quota: 60, role: 'operator' })
 
 const rules: FormRules = {
   company: [{ required: true, message: 'Required', trigger: 'blur' }],
-  email: [
-    { required: true, message: 'Required', trigger: 'blur' },
-    { type: 'email', message: 'Invalid email', trigger: 'blur' },
-  ],
+  email: [{ required: true, message: 'Required', trigger: 'blur' }, { type: 'email', message: 'Invalid email', trigger: 'blur' }],
   name: [{ required: true, message: 'Required', trigger: 'blur' }],
   role: [{ required: true, message: 'Required', trigger: 'change' }],
 }
@@ -90,48 +79,28 @@ const rules: FormRules = {
 async function submitForm() {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
-
   submitting.value = true
-  window.setTimeout(() => {
-    submitting.value = false
-    ElMessage.success(t('common.success'))
-    router.push('/workspace/users')
-  }, 500)
+  window.setTimeout(() => { submitting.value = false; ElMessage.success(t('common.success')); router.push('/workspace/users') }, 500)
 }
 </script>
 
 <style lang="scss" scoped>
-.form-grid {
-  display: grid;
-  gap: 14px;
-}
+.form-grid { display: grid; gap: 16px; }
 
 .field-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 16px;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;
 }
 
-.span-2 {
-  grid-column: span 2;
-}
+.span-2 { grid-column: span 2; }
 
 .submit-bar {
-  position: sticky;
-  bottom: 2px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 12px;
+  position: sticky; bottom: 0;
+  display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px;
+  background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md);
 }
 
 @media (max-width: 760px) {
-  .field-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .span-2 {
-    grid-column: auto;
-  }
+  .field-grid { grid-template-columns: 1fr; }
+  .span-2 { grid-column: auto; }
 }
 </style>

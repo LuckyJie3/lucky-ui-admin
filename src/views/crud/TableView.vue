@@ -37,26 +37,21 @@
         <div class="table-header">
           <div>
             <h3 class="section-title">{{ t('table.title') }}</h3>
-            <p class="muted-text">{{ selectedRows.length }} selected</p>
+            <p class="muted-text" style="margin-top: 2px;">{{ selectedRows.length }} selected</p>
           </div>
           <div class="table-actions">
-            <el-button :icon="Download" :disabled="!selectedRows.length">{{ t('common.export') }}</el-button>
-            <el-button :icon="Refresh" @click="loadData">{{ t('common.refresh') }}</el-button>
+            <el-button size="small" :icon="Download" :disabled="!selectedRows.length">{{ t('common.export') }}</el-button>
+            <el-button size="small" :icon="Refresh" @click="loadData">{{ t('common.refresh') }}</el-button>
           </div>
         </div>
       </template>
 
-      <el-table
-        v-loading="loading"
-        :data="pagedRows"
-        row-key="id"
-        @selection-change="selectedRows = $event"
-      >
-        <el-table-column type="selection" width="46" />
-        <el-table-column :label="t('table.customer')" min-width="190">
+      <el-table v-loading="loading" :data="pagedRows" row-key="id" @selection-change="selectedRows = $event">
+        <el-table-column type="selection" width="42" />
+        <el-table-column :label="t('table.customer')" min-width="180">
           <template #default="{ row }">
             <div class="customer-cell">
-              <el-avatar :size="34">{{ row.name.slice(0, 1) }}</el-avatar>
+              <el-avatar :size="28" style="background: var(--color-primary); font-size: 12px;">{{ row.name.slice(0, 1) }}</el-avatar>
               <div>
                 <strong>{{ row.name }}</strong>
                 <span>{{ row.email }}</span>
@@ -64,20 +59,20 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="company" :label="t('table.company')" min-width="170" />
-        <el-table-column prop="role" :label="t('table.role')" width="130" />
-        <el-table-column prop="owner" :label="t('table.owner')" width="130" />
-        <el-table-column :label="t('table.status')" width="120">
+        <el-table-column prop="company" :label="t('table.company')" min-width="150" />
+        <el-table-column prop="role" :label="t('table.role')" width="110" />
+        <el-table-column prop="owner" :label="t('table.owner')" width="110" />
+        <el-table-column :label="t('table.status')" width="100">
           <template #default="{ row }">
-            <el-tag :type="statusMap[row.status].type" effect="light">
+            <el-tag :type="statusMap[row.status].type" size="small" effect="light">
               {{ t(statusMap[row.status].label) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="lastActive" :label="t('table.lastActive')" width="150" />
-        <el-table-column :label="t('common.more')" width="120" fixed="right">
+        <el-table-column prop="lastActive" :label="t('table.lastActive')" width="130" />
+        <el-table-column :label="t('common.more')" width="90" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="router.push({ path: '/workspace/users/create', query: { id: row.id } })">
+            <el-button link type="primary" size="small" @click="router.push({ path: '/workspace/users/create', query: { id: row.id } })">
               {{ t('common.edit') }}
             </el-button>
           </template>
@@ -88,10 +83,11 @@
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
-          :page-sizes="[8, 16, 32]"
+          :page-sizes="[10, 20, 50]"
           :total="filteredRows.length"
           background
           layout="total, sizes, prev, pager, next"
+          small
         />
       </div>
     </GlassCard>
@@ -108,14 +104,7 @@ import GlassCard from '@/components/common/GlassCard.vue'
 type Status = 'active' | 'paused' | 'pending'
 
 interface CustomerRow {
-  id: number
-  company: string
-  email: string
-  lastActive: string
-  name: string
-  owner: string
-  role: string
-  status: Status
+  id: number; company: string; email: string; lastActive: string; name: string; owner: string; role: string; status: Status
 }
 
 const { t } = useI18n()
@@ -123,7 +112,7 @@ const router = useRouter()
 const loading = ref(false)
 const selectedRows = ref<CustomerRow[]>([])
 const filters = reactive({ keyword: '', status: '' })
-const pagination = reactive({ page: 1, pageSize: 8 })
+const pagination = reactive({ page: 1, pageSize: 10 })
 
 const statusMap: Record<Status, { label: string; type: 'success' | 'warning' | 'info' }> = {
   active: { label: 'table.active', type: 'success' },
@@ -136,25 +125,19 @@ const rows = ref<CustomerRow[]>(
     const id = index + 1
     const status = (['active', 'pending', 'paused'] as Status[])[index % 3]
     return {
-      id,
-      company: ['Northstar Labs', 'Cedar Cloud', 'Moonrise Retail', 'Atlas Works'][index % 4],
+      id, company: ['Northstar Labs', 'Cedar Cloud', 'Moonrise Retail', 'Atlas Works'][index % 4],
       email: `customer${id}@lucky-admin.dev`,
       lastActive: `2026-06-${String((index % 24) + 1).padStart(2, '0')}`,
       name: ['林清岚', 'Alex Morgan', '沈星河', 'Mia Chen'][index % 4],
       owner: ['Nora', 'Kai', 'Iris'][index % 3],
-      role: ['Admin', 'Operator', 'Viewer'][index % 3],
-      status,
+      role: ['Admin', 'Operator', 'Viewer'][index % 3], status,
     }
   }),
 )
 
 const filteredRows = computed(() => rows.value.filter((row) => {
   const keyword = filters.keyword.trim().toLowerCase()
-  const matchesKeyword = !keyword
-    || row.name.toLowerCase().includes(keyword)
-    || row.email.toLowerCase().includes(keyword)
-    || row.company.toLowerCase().includes(keyword)
-
+  const matchesKeyword = !keyword || row.name.toLowerCase().includes(keyword) || row.email.toLowerCase().includes(keyword) || row.company.toLowerCase().includes(keyword)
   return matchesKeyword && (!filters.status || row.status === filters.status)
 }))
 
@@ -163,73 +146,42 @@ const pagedRows = computed(() => {
   return filteredRows.value.slice(start, start + pagination.pageSize)
 })
 
-function applyFilters() {
-  pagination.page = 1
-}
-
-function resetFilters() {
-  filters.keyword = ''
-  filters.status = ''
-  applyFilters()
-}
-
-function loadData() {
-  loading.value = true
-  window.setTimeout(() => {
-    loading.value = false
-  }, 360)
-}
+function applyFilters() { pagination.page = 1 }
+function resetFilters() { filters.keyword = ''; filters.status = ''; applyFilters() }
+function loadData() { loading.value = true; window.setTimeout(() => { loading.value = false }, 360) }
 </script>
 
 <style lang="scss" scoped>
 .filter-bar {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(180px, 260px) auto;
+  grid-template-columns: minmax(200px, 1fr) minmax(160px, 220px) auto;
   gap: 12px;
   align-items: end;
 
-  :deep(.el-form-item) {
-    margin-bottom: 0;
-  }
+  :deep(.el-form-item) { margin-bottom: 0; }
 }
 
-.filter-actions,
-.table-actions,
-.table-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.filter-actions, .table-actions, .table-header {
+  display: flex; align-items: center; gap: 8px;
 }
 
 .table-header {
-  width: 100%;
-  justify-content: space-between;
+  width: 100%; justify-content: space-between;
 }
 
 .customer-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex; align-items: center; gap: 8px;
 
-  div {
-    display: grid;
-  }
-
-  span {
-    color: var(--text-muted);
-    font-size: 12px;
-  }
+  div { display: grid; }
+  strong { font-size: 13px; font-weight: 500; }
+  span { color: var(--text-muted); font-size: 12px; }
 }
 
 .pagination-row {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 16px;
+  display: flex; justify-content: flex-end; padding-top: 16px;
 }
 
 @media (max-width: 900px) {
-  .filter-bar {
-    grid-template-columns: 1fr;
-  }
+  .filter-bar { grid-template-columns: 1fr; }
 }
 </style>

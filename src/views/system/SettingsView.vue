@@ -6,7 +6,7 @@
         <h1 class="page-hero__title">{{ t('settings.title') }}</h1>
         <p class="page-hero__subtitle">{{ t('settings.subtitle') }}</p>
       </div>
-      <el-button :icon="RefreshLeft" @click="resetPreferences">{{ t('settings.resetSettings') }}</el-button>
+      <el-button size="small" :icon="RefreshLeft" @click="resetPreferences">{{ t('settings.resetSettings') }}</el-button>
     </section>
 
     <section class="settings-grid">
@@ -21,21 +21,25 @@
             @click="setTheme(option.value)"
           >
             <span class="theme-preview" :class="`theme-preview--${option.value}`" />
-            {{ t(option.label) }}
+            <span class="theme-label">{{ t(option.label) }}</span>
           </button>
         </div>
 
-        <div class="color-row">
-          <span>{{ t('settings.primaryColor') }}</span>
-          <button
-            v-for="color in colors"
-            :key="color"
-            class="color-dot"
-            :class="{ active: appStore.primaryColor === color }"
-            :style="{ backgroundColor: color }"
-            type="button"
-            @click="appStore.setPrimaryColor(color)"
-          />
+        <div class="color-section">
+          <p class="color-label">{{ t('settings.primaryColor') }}</p>
+          <div class="color-row">
+            <button
+              v-for="color in colors"
+              :key="color"
+              class="color-swatch"
+              :class="{ active: appStore.primaryColor === color }"
+              :style="{ '--sw-color': color }"
+              type="button"
+              @click="appStore.setPrimaryColor(color)"
+            >
+              <el-icon v-if="appStore.primaryColor === color" :size="12" color="#fff"><Check /></el-icon>
+            </button>
+          </div>
         </div>
       </GlassCard>
 
@@ -47,18 +51,18 @@
       </GlassCard>
 
       <GlassCard :title="t('settings.layout')" :description="t('settings.layoutTips')">
-        <div class="layout-list">
-          <label>
+        <div class="switch-list">
+          <label class="switch-item">
             <span>{{ t('settings.showBreadcrumb') }}</span>
-            <el-switch :model-value="appStore.showBreadcrumb" @change="(value) => appStore.setShowBreadcrumb(Boolean(value))" />
+            <el-switch :model-value="appStore.showBreadcrumb" @change="(v) => appStore.setShowBreadcrumb(Boolean(v))" />
           </label>
-          <label>
+          <label class="switch-item">
             <span>{{ t('settings.showFooter') }}</span>
-            <el-switch :model-value="appStore.showFooter" @change="(value) => appStore.setShowFooter(Boolean(value))" />
+            <el-switch :model-value="appStore.showFooter" @change="(v) => appStore.setShowFooter(Boolean(v))" />
           </label>
-          <label>
+          <label class="switch-item">
             <span>{{ t('settings.compactMode') }}</span>
-            <el-switch :model-value="appStore.compactMode" @change="(value) => appStore.setCompactMode(Boolean(value))" />
+            <el-switch :model-value="appStore.compactMode" @change="(v) => appStore.setCompactMode(Boolean(v))" />
           </label>
         </div>
       </GlassCard>
@@ -69,7 +73,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
-import { RefreshLeft } from '@element-plus/icons-vue'
+import { Check, RefreshLeft } from '@element-plus/icons-vue'
 import GlassCard from '@/components/common/GlassCard.vue'
 import { useAppStore } from '@/stores/app'
 import { useLocale, type Locale } from '@/composables/useLocale'
@@ -86,7 +90,7 @@ const themeOptions: Array<{ label: string; value: ThemeMode }> = [
   { label: 'settings.autoMode', value: 'auto' },
 ]
 
-const colors = ['#0f8f8c', '#2563eb', '#16a34a', '#d97706', '#dc2626', '#7c3aed']
+const colors = ['#0066ff', '#7c3aed', '#16a34a', '#d97706', '#dc2626', '#0f8f8c']
 
 function resetPreferences() {
   appStore.resetPreferences()
@@ -97,88 +101,98 @@ function resetPreferences() {
 <style lang="scss" scoped>
 .settings-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 16px;
 }
 
 .theme-options {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 
 .theme-option {
-  display: grid;
-  gap: 10px;
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
   cursor: pointer;
+  transition: all var(--transition-fast);
 
   &.active {
-    color: var(--color-primary);
-    border-color: rgba(var(--color-primary-rgb), 0.5);
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
   }
 }
 
 .theme-preview {
-  height: 68px;
-  border-radius: var(--radius-sm);
+  height: 52px;
+  border-radius: var(--radius-xs);
   border: 1px solid var(--border-color);
 
-  &--light {
-    background: linear-gradient(90deg, #ffffff 28%, #edf4f1 28%);
-  }
+  &--light { background: linear-gradient(90deg, #fff 30%, #f0f2f5 30%); }
+  &--dark  { background: linear-gradient(90deg, #141414 30%, #1a1a1a 30%); }
+  &--auto  { background: linear-gradient(135deg, #fff 0 50%, #141414 50%); }
+}
 
-  &--dark {
-    background: linear-gradient(90deg, #07100f 28%, #142221 28%);
-  }
+.theme-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+}
 
-  &--auto {
-    background: linear-gradient(135deg, #ffffff 0 50%, #07100f 50% 100%);
-  }
+.color-section {
+  margin-top: 16px;
+}
+
+.color-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
 }
 
 .color-row {
   display: flex;
-  align-items: center;
+  gap: 8px;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
+}
+
+.color-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background: var(--sw-color);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &.active {
+    border-color: var(--sw-color);
+    box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--sw-color);
+  }
+}
+
+.switch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.switch-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
   color: var(--text-secondary);
 }
 
-.color-dot {
-  width: 28px;
-  height: 28px;
-  border: 2px solid rgba(255, 255, 255, 0.7);
-  border-radius: 50%;
-  cursor: pointer;
-
-  &.active {
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
-  }
-}
-
-.layout-list {
-  display: grid;
-  gap: 16px;
-
-  label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    color: var(--text-secondary);
-  }
-}
-
-@media (max-width: 980px) {
-  .settings-grid {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 900px) {
+  .settings-grid { grid-template-columns: 1fr; }
 }
 </style>

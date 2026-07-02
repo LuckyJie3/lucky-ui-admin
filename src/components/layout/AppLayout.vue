@@ -1,13 +1,16 @@
 <template>
   <div class="admin-layout" :class="{ 'is-collapsed': appStore.sidebarCollapsed }">
     <aside class="layout-sidebar">
-      <button class="brand" type="button" @click="router.push('/dashboard')">
-        <span class="brand__mark">L</span>
-        <span class="brand__copy">
-          <strong>Lucky Admin</strong>
-          <small>Glass console</small>
+      <div class="brand" @click="router.push('/dashboard')">
+        <span class="brand__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </span>
-      </button>
+        <span class="brand__text" v-show="!appStore.sidebarCollapsed">
+          <strong>Lucky</strong>
+        </span>
+      </div>
 
       <el-scrollbar class="menu-scroll">
         <el-menu
@@ -47,39 +50,26 @@
     <section class="layout-stage">
       <header class="layout-header">
         <div class="header-left">
-          <el-tooltip :content="appStore.sidebarCollapsed ? t('navbar.expand') : t('navbar.collapse')">
-            <button class="icon-button" type="button" @click="appStore.toggleSidebar()">
-              <el-icon><Expand v-if="appStore.sidebarCollapsed" /><Fold v-else /></el-icon>
-            </button>
-          </el-tooltip>
-          <AppBreadcrumb v-if="appStore.showBreadcrumb" class="breadcrumb" />
+          <button class="header-btn" type="button" @click="appStore.toggleSidebar()">
+            <el-icon :size="18"><Expand v-if="appStore.sidebarCollapsed" /><Fold v-else /></el-icon>
+          </button>
+          <AppBreadcrumb v-if="appStore.showBreadcrumb" />
         </div>
 
-        <div class="header-search">
-          <el-icon><Search /></el-icon>
-          <span>{{ t('common.search') }}</span>
-          <kbd>⌘K</kbd>
-        </div>
+        <div class="header-right">
+          <button class="header-btn" type="button" @click="toggleTheme()">
+            <el-icon :size="18"><Moon v-if="resolved === 'dark'" /><Sunny v-else /></el-icon>
+          </button>
 
-        <div class="header-actions">
-          <el-tooltip :content="t('navbar.localeSwitch')">
-            <button class="text-button" type="button" @click="toggleLocale()">
-              {{ appStore.locale === 'zh-CN' ? 'EN' : '中' }}
-            </button>
-          </el-tooltip>
-
-          <el-tooltip :content="themeLabel">
-            <button class="icon-button" type="button" @click="toggleTheme()">
-              <el-icon><Moon v-if="resolved === 'dark'" /><Sunny v-else /></el-icon>
-            </button>
-          </el-tooltip>
+          <button class="header-btn" type="button" @click="toggleLocale()">
+            <span style="font-size: 13px; font-weight: 500;">{{ appStore.locale === 'zh-CN' ? 'EN' : '中' }}</span>
+          </button>
 
           <el-dropdown trigger="click" @command="handleUserCommand">
-            <button class="user-chip" type="button">
-              <el-avatar :size="30" :icon="UserFilled" />
-              <span>{{ userStore.username }}</span>
-              <el-icon><ArrowDown /></el-icon>
-            </button>
+            <div class="user-info">
+              <el-avatar :size="26" :icon="UserFilled" style="background: var(--color-primary);" />
+              <span class="user-name">{{ userStore.username }}</span>
+            </div>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="settings">
@@ -97,17 +87,19 @@
       </header>
 
       <nav v-if="tabsStore.tabs.length" class="layout-tabs">
-        <button
-          v-for="tab in tabsStore.tabs"
-          :key="tab.path"
-          class="tab-item"
-          :class="{ active: tabsStore.activeTab === tab.path }"
-          type="button"
-          @click="router.push(tab.fullPath)"
-        >
-          <span>{{ t(tab.title) }}</span>
-          <el-icon v-if="!tab.affix" class="tab-close" @click.stop="closeTab(tab)"><Close /></el-icon>
-        </button>
+        <div class="tabs-scroll">
+          <button
+            v-for="tab in tabsStore.tabs"
+            :key="tab.path"
+            class="tab-item"
+            :class="{ active: tabsStore.activeTab === tab.path }"
+            type="button"
+            @click="router.push(tab.fullPath)"
+          >
+            <span>{{ t(tab.title) }}</span>
+            <el-icon v-if="!tab.affix" class="tab-close" @click.stop="closeTab(tab)"><Close /></el-icon>
+          </button>
+        </div>
       </nav>
 
       <main class="layout-main">
@@ -119,8 +111,6 @@
           </transition>
         </router-view>
       </main>
-
-      <AppFooter v-if="appStore.showFooter" />
     </section>
   </div>
 </template>
@@ -131,8 +121,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessageBox } from 'element-plus'
 import {
-  Aim,
-  ArrowDown,
   ChatLineRound,
   Close,
   Collection,
@@ -149,16 +137,15 @@ import {
   MagicStick,
   Monitor,
   Moon,
-  Search,
   Setting,
   SwitchButton,
+  Stamp,
   Sunny,
   Tickets,
   User,
   UserFilled,
 } from '@element-plus/icons-vue'
 import AppBreadcrumb from './AppBreadcrumb.vue'
-import AppFooter from './AppFooter.vue'
 import { asyncRoutes, type MenuIcon } from '@/router/routes'
 import { useAppStore } from '@/stores/app'
 import { useTabsStore, type TabItem } from '@/stores/tabs'
@@ -173,7 +160,7 @@ const router = useRouter()
 const appStore = useAppStore()
 const tabsStore = useTabsStore()
 const userStore = useUserStore()
-const { resolved, toggleTheme, themeMode } = useTheme()
+const { resolved, toggleTheme } = useTheme()
 const { toggleLocale } = useLocale()
 
 const iconMap: Record<MenuIcon, unknown> = {
@@ -191,21 +178,12 @@ const iconMap: Record<MenuIcon, unknown> = {
   settings: Setting,
   system: Grid,
   users: User,
-  workspace: Aim,
+  workspace: Stamp,
 }
 
 const menuRoutes = computed(() => asyncRoutes.filter((item) => !item.meta?.hidden))
 const cachedViews = computed(() => tabsStore.tabs.map((tab) => tab.name).filter(Boolean))
 const activeMenu = computed(() => route.meta.hidden ? route.matched.at(-2)?.path || route.path : route.path)
-const themeLabel = computed(() => {
-  const labels = {
-    auto: appStore.locale === 'zh-CN' ? '跟随系统' : 'System',
-    dark: appStore.locale === 'zh-CN' ? '暗色' : 'Dark',
-    light: appStore.locale === 'zh-CN' ? '亮色' : 'Light',
-  }
-
-  return labels[themeMode.value]
-})
 
 function getIcon(icon?: MenuIcon) {
   return icon ? iconMap[icon] || List : List
@@ -231,7 +209,6 @@ function resolveRoutePath(item: RouteRecordRaw, parentPath = '') {
 function closeTab(tab: TabItem) {
   const currentIndex = tabsStore.tabs.findIndex((item) => item.path === tab.path)
   tabsStore.removeTab(tab.path)
-
   if (tab.path === route.path) {
     const nextTab = tabsStore.tabs[Math.max(0, currentIndex - 1)]
     router.push(nextTab?.fullPath || '/dashboard')
@@ -243,7 +220,6 @@ function handleUserCommand(command: string) {
     router.push('/system/settings')
     return
   }
-
   if (command === 'logout') {
     ElMessageBox.confirm(t('navbar.logoutConfirm'), t('common.tips'), {
       cancelButtonText: t('common.cancel'),
@@ -267,99 +243,70 @@ watch(
 @use '@/assets/styles/mixins' as *;
 
 .admin-layout {
-  display: grid;
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  display: flex;
   height: 100vh;
-  padding: 14px;
-  gap: 14px;
   overflow: hidden;
-  transition: grid-template-columns var(--transition-base);
-
-  &.is-collapsed {
-    grid-template-columns: var(--sidebar-collapsed-width) minmax(0, 1fr);
-  }
 }
 
-.layout-sidebar,
-.layout-header,
-.layout-tabs {
-  @include glass-surface;
-  @include glass-edge;
-}
-
+/* ── Sidebar ── */
 .layout-sidebar {
   display: flex;
-  min-width: 0;
   flex-direction: column;
-  border-radius: var(--radius-xl);
-  overflow: hidden;
+  width: var(--sidebar-width);
+  background: var(--bg-primary);
+  border-right: 1px solid var(--border-color);
+  transition: width var(--transition-base);
+  flex-shrink: 0;
+}
+
+.is-collapsed .layout-sidebar {
+  width: var(--sidebar-collapsed-width);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  width: 100%;
-  height: 74px;
-  gap: 12px;
-  padding: 0 18px;
-  border: 0;
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-primary);
-  background: transparent;
+  height: 50px;
+  padding: 0 16px;
+  gap: 10px;
   cursor: pointer;
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
 }
 
-.brand__mark {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
-  place-items: center;
-  border-radius: 12px;
-  color: #fff;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.25), transparent 45%),
-    linear-gradient(135deg, var(--color-primary), #114e4d);
-  font-size: 18px;
-  font-weight: 820;
-  box-shadow: 0 14px 24px rgba(var(--color-primary-rgb), 0.28);
-}
-
-.brand__copy {
+.brand__icon {
   display: flex;
-  min-width: 0;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  flex-shrink: 0;
+}
 
-  strong,
-  small {
-    @include text-ellipsis;
-    max-width: 170px;
-  }
-
+.brand__text {
   strong {
-    font-size: 15px;
-    letter-spacing: 0;
-  }
-
-  small {
-    color: var(--text-muted);
-    font-size: 11px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
   }
 }
 
 .is-collapsed .brand {
   justify-content: center;
   padding: 0;
+  gap: 0;
 }
 
-.is-collapsed .brand__copy {
-  display: none;
+.is-collapsed .menu-scroll {
+  padding: 8px 4px;
 }
 
 .menu-scroll {
   flex: 1;
-  padding: 12px 8px;
+  padding: 8px;
 }
 
 .sidebar-menu {
@@ -368,210 +315,204 @@ watch(
   &:not(.el-menu--collapse) {
     :deep(.el-menu-item),
     :deep(.el-sub-menu__title) {
-      padding-right: 12px;
+      padding-right: 10px;
     }
   }
 
   &.el-menu--collapse {
-    width: 100%;
-
     :deep(.el-menu-item),
     :deep(.el-sub-menu__title) {
       justify-content: center;
       width: 44px;
-      margin: 4px auto;
+      margin: 2px auto;
       padding: 0 !important;
     }
   }
 
   :deep(.el-menu-item),
   :deep(.el-sub-menu__title) {
-    height: 44px;
-    margin: 4px 6px;
-    border-radius: var(--radius-md);
+    height: 38px;
+    margin: 2px 0;
+    border-radius: var(--radius-sm);
     color: var(--text-secondary);
-    line-height: 44px;
+    line-height: 38px;
+    font-size: 13px;
+    transition: all var(--transition-fast);
   }
 
   :deep(.el-icon) {
-    width: 20px;
-    font-size: 18px;
+    width: 18px;
+    font-size: 16px;
+    margin-right: 8px;
   }
 
   :deep(.el-menu-item:hover),
   :deep(.el-sub-menu__title:hover) {
     color: var(--text-primary);
-    background: rgba(var(--color-primary-rgb), 0.08);
+    background: var(--bg-hover);
   }
 
   :deep(.el-menu-item.is-active) {
     color: var(--color-primary);
-    background: rgba(var(--color-primary-rgb), 0.13);
-    font-weight: 720;
+    background: var(--color-primary-light);
+    font-weight: 500;
   }
 }
 
+/* ── Stage (right side) ── */
 .layout-stage {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   min-width: 0;
   min-height: 0;
-  grid-template-rows: var(--navbar-height) auto minmax(0, 1fr) auto;
-  gap: 12px;
+  background: var(--bg-body);
 }
 
+/* ── Header ── */
 .layout-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 420px) minmax(0, 1fr);
+  display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 0 14px;
-  border-radius: var(--radius-xl);
+  justify-content: space-between;
+  height: var(--navbar-height);
+  padding: 0 16px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .header-left,
-.header-actions,
-.user-chip {
+.header-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
-.header-actions {
-  justify-content: flex-end;
-}
-
-.breadcrumb {
-  min-width: 0;
-}
-
-.header-search {
+.header-btn {
   display: flex;
   align-items: center;
-  min-width: 0;
-  gap: 8px;
-  height: 40px;
-  padding: 0 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.24);
-
-  span {
-    flex: 1;
-    font-size: 13px;
-  }
-
-  kbd {
-    padding: 2px 6px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    color: var(--text-muted);
-    background: rgba(255, 255, 255, 0.25);
-    font-size: 11px;
-  }
-}
-
-.icon-button,
-.text-button,
-.user-chip {
-  height: 38px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
   background: transparent;
   cursor: pointer;
-  transition: var(--transition-fast);
-}
+  transition: all var(--transition-fast);
 
-.icon-button {
-  display: grid;
-  width: 38px;
-  place-items: center;
-}
-
-.text-button {
-  min-width: 38px;
-  padding: 0 10px;
-  font-weight: 760;
-}
-
-.user-chip {
-  padding: 0 8px 0 4px;
-
-  span {
-    max-width: 96px;
-    @include text-ellipsis;
+  &:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
   }
 }
 
-.icon-button:hover,
-.text-button:hover,
-.user-chip:hover {
-  border-color: var(--border-color);
-  color: var(--text-primary);
-  background: rgba(var(--color-primary-rgb), 0.08);
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: var(--bg-hover);
+  }
 }
 
+.user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  max-width: 80px;
+  @include text-ellipsis;
+}
+
+/* ── Tabs ── */
 .layout-tabs {
   display: flex;
   align-items: center;
-  min-height: var(--tabs-height);
-  gap: 6px;
-  padding: 5px;
-  border-radius: var(--radius-lg);
+  height: var(--tabs-height);
+  padding: 0 12px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.tabs-scroll {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .tab-item {
   display: inline-flex;
   align-items: center;
-  height: calc(var(--tabs-height) - 10px);
-  gap: 6px;
-  padding: 0 11px;
-  border: 0;
+  height: 28px;
+  gap: 4px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  background: transparent;
+  background: var(--bg-primary);
   white-space: nowrap;
+  font-size: 12px;
   cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
 
   &.active {
     color: var(--color-primary);
-    background: rgba(var(--color-primary-rgb), 0.12);
-    font-weight: 720;
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+    font-weight: 500;
   }
 }
 
 .tab-close {
-  width: 14px;
-  height: 14px;
-  opacity: 0.55;
+  width: 12px;
+  height: 12px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+
+  .tab-item:hover & {
+    opacity: 0.6;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
+/* ── Main ── */
 .layout-main {
+  flex: 1;
   min-width: 0;
   min-height: 0;
   overflow: auto;
-  padding: 2px;
+  padding: 16px;
 }
 
 @media (max-width: 980px) {
-  .admin-layout {
-    grid-template-columns: var(--sidebar-collapsed-width) minmax(0, 1fr);
+  .layout-sidebar {
+    width: var(--sidebar-collapsed-width);
   }
 
-  .brand__copy,
-  .breadcrumb,
-  .header-search {
+  .brand__text,
+  .header-left :deep(.app-breadcrumb) {
     display: none;
-  }
-
-  .layout-header {
-    grid-template-columns: auto 1fr;
-  }
-
-  .header-actions {
-    grid-column: 2;
   }
 }
 </style>

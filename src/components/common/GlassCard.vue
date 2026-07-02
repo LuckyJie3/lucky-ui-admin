@@ -1,17 +1,15 @@
 <template>
-  <section class="glass-card" :class="[`glass-card--${variant}`]">
-    <header v-if="$slots.header || title" class="glass-card__header">
+  <section class="app-card" :class="[`app-card--${variant}`]">
+    <header v-if="$slots.header || title" class="app-card__header">
       <slot name="header">
-        <div>
-          <h3 class="glass-card__title">{{ title }}</h3>
-          <p v-if="description" class="glass-card__description">{{ description }}</p>
-        </div>
+        <h3 v-if="title" class="app-card__title">{{ title }}</h3>
+        <p v-if="description" class="app-card__description">{{ description }}</p>
       </slot>
     </header>
-    <div class="glass-card__body">
+    <div class="app-card__body">
       <slot />
     </div>
-    <footer v-if="$slots.footer" class="glass-card__footer">
+    <footer v-if="$slots.footer" class="app-card__footer">
       <slot name="footer" />
     </footer>
   </section>
@@ -31,53 +29,54 @@ withDefaults(
 </script>
 
 <style lang="scss" scoped>
-@use '@/assets/styles/mixins' as *;
-
-.glass-card {
-  border-radius: var(--radius-lg);
+.app-card {
+  border-radius: var(--radius-md);
   overflow: hidden;
-  @include glass-surface;
-  @include glass-edge;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
 
   &--flat {
-    background: var(--bg-primary);
+    box-shadow: none;
+  }
+
+  &--default {
     box-shadow: var(--shadow-sm);
   }
 
   &--strong {
-    background: linear-gradient(145deg, var(--glass-bg-strong), rgba(var(--color-primary-rgb), 0.1));
+    box-shadow: var(--shadow-sm);
+    border-left: 3px solid var(--color-primary);
   }
 }
 
-.glass-card__header {
+.app-card__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-light);
 }
 
-.glass-card__title {
+.app-card__title {
   color: var(--text-primary);
-  font-size: 16px;
-  font-weight: 760;
-  line-height: 1.2;
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.glass-card__description {
-  margin-top: 4px;
+.app-card__description {
+  margin-top: 2px;
   color: var(--text-muted);
   font-size: 12px;
 }
 
-.glass-card__body {
-  padding: 18px;
+.app-card__body {
+  padding: 16px;
 }
 
-.glass-card__footer {
-  padding: 14px 18px;
-  border-top: 1px solid var(--border-color);
-  background: rgba(var(--color-primary-rgb), 0.04);
+.app-card__footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-secondary);
 }
 </style>

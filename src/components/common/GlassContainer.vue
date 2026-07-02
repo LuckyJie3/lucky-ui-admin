@@ -1,17 +1,15 @@
 <template>
-  <div class="glass-container">
+  <div class="card-container">
     <slot />
   </div>
 </template>
 
 <style lang="scss" scoped>
-@use '@/assets/styles/mixins' as *;
-
-.glass-container {
-  padding: 20px;
-  border-radius: var(--radius-lg);
-  transition: all var(--transition-base);
-  @include glass-surface;
-  @include glass-edge;
+.card-container {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 </style>
