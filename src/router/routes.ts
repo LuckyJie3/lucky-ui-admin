@@ -16,6 +16,11 @@ export type MenuIcon =
   | 'settings'
   | 'permissions'
   | 'logs'
+  | 'notifications'
+  | 'messages'
+  | 'help'
+  | 'folder'
+  | 'profile'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -93,6 +98,12 @@ export const asyncRoutes: RouteRecordRaw[] = [
         meta: { title: 'nav.marketing', icon: 'marketing' },
       },
       {
+        path: 'files',
+        name: 'FileManager',
+        component: () => import('@/views/workspace/FileManager.vue'),
+        meta: { title: 'nav.files', icon: 'folder' },
+      },
+      {
         path: 'users/create',
         name: 'CreateCustomer',
         component: () => import('@/views/crud/FormView.vue'),
@@ -141,10 +152,34 @@ export const asyncRoutes: RouteRecordRaw[] = [
       {
         path: 'logs',
         name: 'AuditLogs',
-        component: () => import('@/views/dashboard/DashboardView.vue'),
+        component: () => import('@/views/system/AuditLogsView.vue'),
         meta: { title: 'nav.logs', icon: 'logs' },
       },
+      {
+        path: 'notifications',
+        name: 'Notifications',
+        component: () => import('@/views/system/NotificationsView.vue'),
+        meta: { title: 'nav.notifications', icon: 'notifications' },
+      },
+      {
+        path: 'messages',
+        name: 'Messages',
+        component: () => import('@/views/system/MessagesView.vue'),
+        meta: { title: 'nav.messages', icon: 'messages' },
+      },
+      {
+        path: 'help',
+        name: 'Help',
+        component: () => import('@/views/system/HelpView.vue'),
+        meta: { title: 'nav.help', icon: 'help' },
+      },
     ],
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('@/views/profile/ProfileView.vue'),
+    meta: { title: 'nav.profile', icon: 'profile', hidden: true },
   },
   {
     path: '/404',

@@ -121,6 +121,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessageBox } from 'element-plus'
 import {
+  Bell,
   ChatLineRound,
   Close,
   Collection,
@@ -129,6 +130,7 @@ import {
   Document,
   Expand,
   Files,
+  Folder,
   Fold,
   Goods,
   Grid,
@@ -137,6 +139,7 @@ import {
   MagicStick,
   Monitor,
   Moon,
+  QuestionFilled,
   Setting,
   SwitchButton,
   Stamp,
@@ -169,12 +172,17 @@ const iconMap: Record<MenuIcon, unknown> = {
   comments: ChatLineRound,
   content: Collection,
   dashboard: DataBoard,
+  folder: Folder,
+  help: QuestionFilled,
   logs: Tickets,
   marketing: MagicStick,
+  messages: ChatLineRound,
   monitor: Monitor,
+  notifications: Bell,
   orders: Files,
   permissions: Key,
   products: Goods,
+  profile: UserFilled,
   settings: Setting,
   system: Grid,
   users: User,
@@ -301,7 +309,7 @@ watch(
 }
 
 .is-collapsed .menu-scroll {
-  padding: 8px 4px;
+  padding: 8px 6px;
 }
 
 .menu-scroll {
@@ -320,12 +328,20 @@ watch(
   }
 
   &.el-menu--collapse {
+    width: 48px;
+    margin: 0 auto;
+
     :deep(.el-menu-item),
-    :deep(.el-sub-menu__title) {
+    :deep(.el-sub-menu > .el-sub-menu__title) {
       justify-content: center;
-      width: 44px;
-      margin: 2px auto;
+      width: 48px;
+      margin: 2px 0;
       padding: 0 !important;
+      overflow: hidden;
+    }
+
+    :deep(.el-icon) {
+      margin-right: 0;
     }
   }
 
@@ -366,7 +382,11 @@ watch(
   flex: 1;
   min-width: 0;
   min-height: 0;
-  background: var(--bg-body);
+  background: #FAFBFC;
+}
+
+[data-theme='dark'] .layout-stage {
+  background: #000000;
 }
 
 /* ── Header ── */
@@ -502,7 +522,7 @@ watch(
   min-width: 0;
   min-height: 0;
   overflow: auto;
-  padding: 16px;
+  padding: 0;
 }
 
 @media (max-width: 980px) {

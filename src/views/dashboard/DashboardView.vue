@@ -1,5 +1,5 @@
 <template>
-  <div class="page-shell dashboard-page">
+  <div class="dashboard-page" style="padding: 16px;">
     <section class="page-hero">
       <div class="hero-info">
         <p class="page-hero__eyebrow">Dashboard</p>
@@ -12,46 +12,56 @@
       </div>
     </section>
 
-    <section class="stats-grid">
-      <div v-for="item in stats" :key="item.key" class="stat-card">
-        <div class="stat-card__header">
-          <span class="stat-card__label">{{ t(item.label) }}</span>
-          <span class="stat-card__icon" :style="{ color: item.color, background: item.tint }">
-            <el-icon :size="16"><component :is="item.icon" /></el-icon>
-          </span>
-        </div>
-        <div class="stat-card__value">{{ item.value }}</div>
-        <div class="stat-card__trend" :class="{ down: item.trend < 0 }">
-          <span>{{ item.trend > 0 ? '&#8593;' : '&#8595;' }} {{ Math.abs(item.trend) }}%</span>
-          <span class="trend-desc">{{ t('dashboard.vsLastMonth') }}</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="dashboard-grid">
-      <GlassCard :title="t('dashboard.salesOverview')">
-        <div class="chart">
-          <div v-for="bar in bars" :key="bar.month" class="chart__col">
-            <span class="chart__bar" :style="{ height: `${bar.value}%` }" />
-            <small>{{ bar.month }}</small>
-          </div>
-        </div>
-      </GlassCard>
-
-      <GlassCard :title="t('dashboard.channelHealth')">
-        <div class="health-list">
-          <div v-for="item in health" :key="item.label" class="health-item">
-            <div class="health-item__head">
-              <span>{{ t(item.label) }}</span>
-              <strong>{{ item.value }}%</strong>
+    <el-row :gutter="20" class="stats-grid">
+      <el-col v-for="item in stats" :key="item.key" :span="6" :xs="12">
+        <el-card shadow="never" class="rounded-md stat-card" :body-style="{ padding: '16px 20px' }">
+          <div class="stat-card__inner">
+            <div>
+              <div class="stat-card__label">{{ t(item.label) }}</div>
+              <div class="stat-card__value">{{ item.value }}</div>
+              <div class="stat-card__trend" :class="item.trend >= 0 ? 'is-up' : 'is-down'">
+                {{ item.trend > 0 ? '&#8593;' : '&#8595;' }} {{ Math.abs(item.trend) }}%
+                <span class="trend-desc">{{ t('dashboard.vsLastMonth') }}</span>
+              </div>
             </div>
-            <el-progress :percentage="item.value" :stroke-width="6" :show-text="false" :color="'var(--color-primary)'" />
+            <div class="stat-card__icon" :style="{ background: item.iconBg }">
+              <el-icon :size="22" :style="{ color: item.iconColor }"><component :is="item.icon" /></el-icon>
+            </div>
           </div>
-        </div>
-      </GlassCard>
-    </section>
+        </el-card>
+      </el-col>
+    </el-row>
 
-    <GlassCard :title="t('dashboard.recentActivity')">
+    <el-row :gutter="20">
+      <el-col :span="14" :xs="24">
+        <el-card shadow="never" class="rounded-md" :body-style="{ padding: '20px' }">
+          <template #header><span class="font-bold">{{ t('dashboard.salesOverview') }}</span></template>
+          <div class="chart">
+            <div v-for="bar in bars" :key="bar.month" class="chart__col">
+              <span class="chart__bar" :style="{ height: `${bar.value}%` }" />
+              <small>{{ bar.month }}</small>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="10" :xs="24">
+        <el-card shadow="never" class="rounded-md" :body-style="{ padding: '20px' }">
+          <template #header><span class="font-bold">{{ t('dashboard.channelHealth') }}</span></template>
+          <div class="health-list">
+            <div v-for="item in health" :key="item.label" class="health-item">
+              <div class="health-item__head">
+                <span>{{ t(item.label) }}</span>
+                <strong>{{ item.value }}%</strong>
+              </div>
+              <el-progress :percentage="item.value" :stroke-width="6" :show-text="false" color="var(--el-color-primary)" />
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-card shadow="never" class="rounded-md" :body-style="{ padding: '20px' }">
+      <template #header><span class="font-bold">{{ t('dashboard.recentActivity') }}</span></template>
       <div class="activity-list">
         <article v-for="item in activities" :key="item.id" class="activity-item">
           <span class="activity-dot" />
@@ -62,22 +72,21 @@
           <time>{{ item.time }}</time>
         </article>
       </div>
-    </GlassCard>
+    </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { Coin, Files, TrendCharts, UserFilled } from '@element-plus/icons-vue'
-import GlassCard from '@/components/common/GlassCard.vue'
 
 const { t } = useI18n()
 
 const stats = [
-  { key: 'users', label: 'dashboard.totalUsers', value: '128,460', trend: 12.8, icon: UserFilled, color: 'hsl(212, 100%, 45%)', tint: 'hsl(212, 100%, 96%)' },
-  { key: 'active', label: 'dashboard.activeUsers', value: '38,212', trend: 8.4, icon: TrendCharts, color: 'hsl(144, 57%, 58%)', tint: 'hsl(144, 57%, 96%)' },
-  { key: 'revenue', label: 'dashboard.revenue', value: '$928k', trend: 6.1, icon: Coin, color: 'hsl(42, 84%, 61%)', tint: 'hsl(42, 84%, 96%)' },
-  { key: 'orders', label: 'dashboard.orders', value: '51,328', trend: -2.3, icon: Files, color: 'hsl(348, 100%, 61%)', tint: 'hsl(348, 100%, 97%)' },
+  { key: 'users', label: 'dashboard.totalUsers', value: '128,460', trend: 12.8, icon: UserFilled, iconColor: '#5b8ff9', iconBg: 'rgba(91, 143, 249, 0.12)' },
+  { key: 'active', label: 'dashboard.activeUsers', value: '38,212', trend: 8.4, icon: TrendCharts, iconColor: '#5ad8a6', iconBg: 'rgba(90, 216, 166, 0.14)' },
+  { key: 'revenue', label: 'dashboard.revenue', value: '$928k', trend: 6.1, icon: Coin, iconColor: '#9270ca', iconBg: 'rgba(146, 112, 202, 0.12)' },
+  { key: 'orders', label: 'dashboard.orders', value: '51,328', trend: -2.3, icon: Files, iconColor: '#f6bd16', iconBg: 'rgba(246, 189, 22, 0.14)' },
 ]
 
 const bars = [
@@ -101,102 +110,54 @@ const activities = [
 </script>
 
 <style lang="scss" scoped>
-.hero-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.hero-badge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 2px solid var(--color-primary);
-  flex-shrink: 0;
-}
-
-.badge-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  line-height: 1;
-}
-
-.badge-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-primary);
-  line-height: 1.2;
-}
-
-/* ── Stats ── */
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  margin-bottom: 20px;
 }
 
-.stat-card {
-  padding: 16px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-}
-
-.stat-card__header {
+.stat-card__inner {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 12px;
+  min-height: 88px;
 }
 
 .stat-card__label {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--el-text-color-secondary);
+}
+
+.stat-card__value {
+  margin-top: 8px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--el-text-color-primary);
+  letter-spacing: -0.02em;
+}
+
+.stat-card__trend {
+  margin-top: 10px;
+  font-size: 12px;
+
+  &.is-up { color: var(--el-color-success); }
+  &.is-down { color: var(--el-color-danger); }
+
+  .trend-desc {
+    color: var(--el-text-color-secondary);
+    font-weight: 400;
+    margin-left: 4px;
+  }
 }
 
 .stat-card__icon {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
-}
-
-.stat-card__value {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1;
-}
-
-.stat-card__trend {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-success);
-
-  &.down {
-    color: var(--color-danger);
-  }
-
-  .trend-desc {
-    color: var(--text-muted);
-    font-weight: 400;
-  }
-}
-
-/* ── Chart grid ── */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 16px;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
 }
 
 .chart {
@@ -204,7 +165,6 @@ const activities = [
   align-items: flex-end;
   height: 220px;
   gap: 8px;
-  padding-top: 16px;
 }
 
 .chart__col {
@@ -216,26 +176,20 @@ const activities = [
   justify-content: flex-end;
   gap: 6px;
 
-  small {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
+  small { font-size: 11px; color: var(--el-text-color-secondary); }
 }
 
 .chart__bar {
   width: 100%;
   min-height: 4px;
   border-radius: 4px 4px 0 0;
-  background: var(--color-primary);
+  background: var(--el-color-primary);
   opacity: 0.8;
-  transition: opacity var(--transition-fast);
+  transition: opacity 0.15s ease;
 
-  &:hover {
-    opacity: 1;
-  }
+  &:hover { opacity: 1; }
 }
 
-/* ── Health ── */
 .health-list {
   display: flex;
   flex-direction: column;
@@ -247,19 +201,14 @@ const activities = [
   justify-content: space-between;
   margin-bottom: 6px;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--el-text-color-secondary);
 
-  strong {
-    font-weight: 600;
-    color: var(--text-primary);
-  }
+  strong { font-weight: 600; color: var(--el-text-color-primary); }
 }
 
-/* ── Activity ── */
 .activity-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
 .activity-item {
@@ -267,16 +216,10 @@ const activities = [
   align-items: flex-start;
   gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--el-border-color-lighter);
 
-  &:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  &:first-child {
-    padding-top: 0;
-  }
+  &:last-child { border-bottom: none; padding-bottom: 0; }
+  &:first-child { padding-top: 0; }
 }
 
 .activity-content {
@@ -286,13 +229,13 @@ const activities = [
   strong {
     font-size: 13px;
     font-weight: 500;
-    color: var(--text-primary);
+    color: var(--el-text-color-primary);
   }
 
   p {
     margin-top: 2px;
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--el-text-color-secondary);
   }
 }
 
@@ -301,29 +244,13 @@ const activities = [
   height: 6px;
   margin-top: 6px;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: var(--el-color-primary);
   flex-shrink: 0;
 }
 
 time {
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--el-text-color-secondary);
   flex-shrink: 0;
-}
-
-@media (max-width: 1100px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 680px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
 }
 </style>
